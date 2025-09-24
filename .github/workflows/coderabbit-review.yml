@@ -1,0 +1,352 @@
+name: 🔍 CodeRabbit AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '**/*.swift'
+      - '**/*.h'
+      - '**/*.m'
+      - '**/*.mm'
+      - '**/project.yml'
+      - '**/*.plist'
+      - '**/*.entitlements'
+      - '**/*.xcconfig'
+      - '.coderabbit.yaml'
+  
+  push:
+    branches: [main, develop]
+    paths:
+      - '**/*.swift'
+      - '**/*.h'
+      - '**/*.m'
+      - '**/*.mm'
+
+jobs:
+  coderabbit-review:
+    name: 🤖 AI Code Review
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better analysis
+    
+    - name: 🤖 CodeRabbit AI Review
+      uses: coderabbitai/coderabbit-action@v2
+      with:
+        # CodeRabbit API token (set in repository secrets)
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        coderabbit_token: ${{ secrets.CODERABBIT_TOKEN }}
+        
+        # Configuration
+        config_path: '.coderabbit.yaml'
+        
+        # Review settings for iOS project
+        language: 'swift'
+        framework: 'swiftui'
+        
+        # Enhanced analysis for iOS
+        enable_security_scan: true
+        enable_performance_analysis: true
+        enable_memory_analysis: true
+        
+        # iOS-specific checks
+        check_memory_leaks: true
+        validate_threading: true
+        check_core_data_usage: true
+        
+        # Review output settings
+        create_review_comment: true
+        create_summary_comment: true
+        auto_resolve_conversations: true
+        
+        # Custom analysis for SketchAI
+        focus_areas: |
+          - Drawing performance optimization
+          - Real-time stroke analysis
+          - Memory management in graphics operations
+          - SwiftUI state management
+          - Core Data threading
+          - Vision framework usage
+          - Educational content accuracy
+
+  swift-lint:
+    name: 📝 Swift Code Quality
+    runs-on: macos-latest
+    needs: coderabbit-review
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔧 Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '16.0'
+    
+    - name: 🛠️ Install SwiftLint
+      run: |
+        brew install swiftlint
+        echo "SwiftLint version: $(swiftlint version)"
+    
+    - name: 📋 Create SwiftLint Config
+      run: |
+        cat > .swiftlint.yml << EOF
+        # SwiftLint Configuration for SketchAI
+        
+        # Rules to enable
+        opt_in_rules:
+          - array_init
+          - attributes
+          - closure_end_indentation
+          - closure_spacing
+          - collection_alignment
+          - contains_over_filter_count
+          - empty_count
+          - empty_string
+          - enum_case_associated_values_count
+          - explicit_init
+          - fatal_error_message
+          - first_where
+          - force_unwrapping
+          - implicitly_unwrapped_optional
+          - last_where
+          - literal_expression_end_indentation
+          - multiline_arguments
+          - multiline_function_chains
+          - multiline_literal_brackets
+          - multiline_parameters
+          - multiline_parameters_brackets
+          - operator_usage_whitespace
+          - overridden_super_call
+          - pattern_matching_keywords
+          - prefer_self_type_over_type_of_self
+          - redundant_nil_coalescing
+          - redundant_type_annotation
+          - strict_fileprivate
+          - switch_case_alignment
+          - toggle_bool
+          - trailing_closure
+          - unneeded_parentheses_in_closure_argument
+          - unused_import
+          - unused_private_declaration
+          - vertical_whitespace_closing_braces
+          - vertical_whitespace_opening_braces
+          - yoda_condition
+        
+        # Disabled rules
+        disabled_rules:
+          - todo
+          - line_length # Will be handled by custom rule
+        
+        # Custom rules for iOS development
+        custom_rules:
+          # Memory management
+          retain_cycle_check:
+            name: "Potential Retain Cycle"
+            regex: '(self\.[a-zA-Z_][a-zA-Z0-9_]*\s*=.*\{[^}]*self)'
+            match_kinds:
+              - comment
+              - identifier
+            message: "Potential retain cycle detected. Consider using [weak self]"
+            severity: warning
+          
+          # Main thread usage
+          main_thread_check:
+            name: "Main Thread Usage"
+            regex: 'DispatchQueue\.main\.async.*\{[^}]*\{[^}]*DispatchQueue'
+            message: "Nested dispatch queues detected. Review threading logic"
+            severity: warning
+          
+          # Core Data threading
+          core_data_threading:
+            name: "Core Data Threading"
+            regex: 'context\.(save|fetch|delete).*\{[^}]*DispatchQueue'
+            message: "Core Data operation in potential threading context"
+            severity: error
+        
+        # File inclusion/exclusion
+        included:
+          - Sources
+          - SketchAI
+          - Drawing
+          - Models
+          - Services
+          - Views
+          - Monetization
+          - Sharing
+          - Tests
+        
+        excluded:
+          - Pods
+          - build
+          - DerivedData
+          - .build
+          - fastlane
+        
+        # Line length configuration
+        line_length:
+          warning: 120
+          error: 150
+          ignores_function_declarations: true
+          ignores_comments: true
+          ignores_urls: true
+        
+        # Function length
+        function_body_length:
+          warning: 60
+          error: 100
+        
+        # Type length
+        type_body_length:
+          warning: 300
+          error: 500
+        
+        # File length
+        file_length:
+          warning: 500
+          error: 800
+        
+        # Cyclomatic complexity
+        cyclomatic_complexity:
+          warning: 10
+          error: 20
+        
+        # Nesting levels
+        nesting:
+          type_level:
+            warning: 2
+            error: 3
+          statement_level:
+            warning: 5
+            error: 10
+        
+        # Reporter
+        reporter: "github-actions-logging"
+        EOF
+    
+    - name: 🔍 Run SwiftLint
+      run: |
+        echo "🔍 Running SwiftLint analysis..."
+        swiftlint lint --reporter github-actions-logging --strict
+        
+        echo "📊 SwiftLint Summary:"
+        swiftlint lint --reporter summary
+    
+    - name: 📈 SwiftLint Metrics
+      if: always()
+      run: |
+        echo "📈 Generating code quality metrics..."
+        
+        # Count warnings and errors
+        WARNINGS=$(swiftlint lint --reporter csv | grep -c ",warning," || echo "0")
+        ERRORS=$(swiftlint lint --reporter csv | grep -c ",error," || echo "0")
+        
+        echo "📊 Code Quality Metrics:"
+        echo "  ⚠️  Warnings: $WARNINGS"
+        echo "  ❌ Errors: $ERRORS"
+        
+        # Save metrics for PR comment
+        echo "SWIFTLINT_WARNINGS=$WARNINGS" >> $GITHUB_ENV
+        echo "SWIFTLINT_ERRORS=$ERRORS" >> $GITHUB_ENV
+
+  performance-analysis:
+    name: 🚀 Performance Analysis
+    runs-on: macos-latest
+    needs: coderabbit-review
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔧 Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '16.0'
+    
+    - name: 🛠️ Install XcodeGen
+      run: brew install xcodegen
+    
+    - name: 📱 Generate Project
+      run: xcodegen generate
+    
+    - name: 🔍 Analyze Performance Patterns
+      run: |
+        echo "🔍 Analyzing performance-critical code patterns..."
+        
+        # Check for main thread blocking patterns
+        echo "📱 Main Thread Analysis:"
+        grep -r "DispatchQueue.main.sync" . --include="*.swift" || echo "✅ No main thread blocking found"
+        
+        # Check for retain cycles
+        echo "🔄 Retain Cycle Analysis:"
+        grep -r "self\." . --include="*.swift" | grep -v "weak self" | grep -v "unowned self" | wc -l | awk '{print "Potential retain cycle locations: " $1}'
+        
+        # Memory-intensive operations
+        echo "💾 Memory Usage Analysis:"
+        grep -r "UIImage\|CGImage\|CVPixelBuffer" . --include="*.swift" | wc -l | awk '{print "Image processing operations: " $1}'
+        
+        # Core Data operations
+        echo "🗃️ Core Data Analysis:"
+        grep -r "\.save()\|\.fetch\|\.delete" . --include="*.swift" | wc -l | awk '{print "Core Data operations: " $1}'
+        
+        # Drawing operations
+        echo "🎨 Drawing Performance Analysis:"
+        grep -r "PKCanvas\|CGContext\|CALayer" . --include="*.swift" | wc -l | awk '{print "Drawing operations: " $1}'
+
+  security-scan:
+    name: 🔒 Security Analysis
+    runs-on: ubuntu-latest
+    needs: coderabbit-review
+    
+    steps:
+    - name: 📥 Checkout Code
+      uses: actions/checkout@v4
+    
+    - name: 🔍 Security Pattern Analysis
+      run: |
+        echo "🔒 Analyzing security patterns..."
+        
+        # Check for hardcoded secrets
+        echo "🔑 Secret Detection:"
+        grep -r "password\|secret\|key\|token" . --include="*.swift" --exclude-dir=".git" | grep -v "// " | grep -v "TODO" || echo "✅ No hardcoded secrets found"
+        
+        # Check for unsafe operations
+        echo "⚠️ Unsafe Operations:"
+        grep -r "unsafeBitCast\|withUnsafeMutablePointer\|assumingMemoryBound" . --include="*.swift" || echo "✅ No unsafe operations found"
+        
+        # Privacy-related patterns
+        echo "🛡️ Privacy Analysis:"
+        grep -r "NSCamera\|NSMicrophone\|NSLocation\|NSContacts" . --include="*.plist" --include="*.swift" || echo "✅ Privacy usage checked"
+
+  summary:
+    name: 📋 Review Summary
+    runs-on: ubuntu-latest
+    needs: [coderabbit-review, swift-lint, performance-analysis, security-scan]
+    if: always()
+    
+    steps:
+    - name: 📋 Generate Summary
+      run: |
+        echo "📋 SketchAI Code Review Summary"
+        echo "================================"
+        echo ""
+        echo "🤖 AI Review: Completed"
+        echo "📝 Code Quality: Analyzed"
+        echo "🚀 Performance: Checked"
+        echo "🔒 Security: Scanned"
+        echo ""
+        echo "📊 Next Steps:"
+        echo "1. Review CodeRabbit AI suggestions"
+        echo "2. Address any critical issues"
+        echo "3. Consider performance optimizations"
+        echo "4. Verify security compliance"
+        echo ""
+        echo "✨ Ready for SketchAI development!"

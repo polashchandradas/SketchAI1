@@ -1,0 +1,199 @@
+# CodeRabbit Configuration for SketchAI iOS Project
+# https://docs.coderabbit.ai/guides/review-instructions
+
+# Project-specific settings for iOS/Swift development
+language: swift
+framework: swiftui
+
+# Review configuration
+reviews:
+  # Enable detailed reviews for all Swift files
+  request_changes: ask
+  auto_review: true
+  
+  # Focus areas for iOS development
+  focus_areas:
+    - "Memory management and ARC"
+    - "SwiftUI best practices"
+    - "iOS performance optimization"
+    - "Core Data usage patterns"
+    - "Drawing and graphics performance"
+    - "Threading and concurrency"
+    - "Error handling patterns"
+    - "Code organization and SOLID principles"
+
+# File patterns to include/exclude
+path_filters:
+  include:
+    - "**/*.swift"
+    - "**/*.h"
+    - "**/*.m"
+    - "**/*.mm"
+    - "**/*.xcdatamodeld/**"
+    - "**/project.yml"
+    - "**/*.plist"
+    - "**/*.entitlements"
+    - "**/*.xcconfig"
+  
+  exclude:
+    - "**/build/**"
+    - "**/DerivedData/**"
+    - "**/.build/**"
+    - "**/Pods/**"
+    - "**/*.xcarchive/**"
+    - "**/fastlane/report.xml"
+    - "**/fastlane/screenshots/**"
+    - "**/fastlane/test_output/**"
+
+# iOS-specific review rules
+rules:
+  ios:
+    # Memory management
+    - check_retain_cycles: true
+    - validate_weak_self: true
+    - check_memory_leaks: true
+    
+    # SwiftUI best practices
+    - validate_state_management: true
+    - check_view_performance: true
+    - validate_binding_usage: true
+    
+    # Core Data
+    - check_core_data_threading: true
+    - validate_managed_object_context: true
+    
+    # Performance
+    - check_main_thread_usage: true
+    - validate_background_processing: true
+    - check_drawing_performance: true
+    
+    # Architecture
+    - validate_mvvm_patterns: true
+    - check_dependency_injection: true
+    - validate_protocol_usage: true
+
+# Custom instructions for SketchAI project
+review_instructions: |
+  ## SketchAI-Specific Review Guidelines
+  
+  This is an AI-powered drawing education app with the following key areas:
+  
+  ### 1. Drawing Performance & Real-time Analysis
+  - Pay special attention to stroke analysis algorithms and DTW (Dynamic Time Warping) implementations
+  - Check for memory efficiency in real-time drawing operations
+  - Validate frame-rate optimization (60fps+ target)
+  - Review circular buffer implementations for memory management
+  
+  ### 2. Computer Vision & ML Integration
+  - Examine Vision framework usage for image analysis
+  - Check Core ML model integration patterns
+  - Validate face detection and landmark analysis code
+  - Review error handling for ML failures
+  
+  ### 3. Memory Management Critical Areas
+  - Drawing canvas operations (high-frequency memory allocation)
+  - Image processing pipelines
+  - Video recording and sharing features
+  - Real-time feedback systems
+  
+  ### 4. SwiftUI Architecture
+  - Review ObservableObject implementations
+  - Check @Published property usage
+  - Validate view lifecycle management
+  - Examine navigation state management
+  
+  ### 5. Educational Content System
+  - Review lesson data models and progression logic
+  - Check achievement system implementation
+  - Validate progress tracking accuracy
+  
+  ### 6. Monetization & Privacy
+  - Review subscription management code
+  - Check privacy compliance (especially for educational apps)
+  - Validate feature gating logic
+  
+  ### 7. Performance Metrics
+  - Flag any operations that could block the main thread
+  - Identify potential performance bottlenecks in drawing algorithms
+  - Review memory usage patterns and cleanup strategies
+
+# Enhanced analysis settings
+analysis:
+  # Enable advanced static analysis
+  static_analysis: true
+  
+  # Security scanning
+  security_scan: true
+  
+  # Performance analysis
+  performance_analysis: true
+  
+  # Code complexity metrics
+  complexity_analysis: true
+  
+  # Dependency analysis
+  dependency_scan: true
+
+# Integration settings
+integrations:
+  github:
+    # Enable PR reviews
+    pull_request_reviews: true
+    
+    # Comment on specific lines
+    inline_comments: true
+    
+    # Summary comments
+    summary_comments: true
+    
+    # Auto-resolve conversations when fixed
+    auto_resolve: true
+
+# Notification preferences
+notifications:
+  # Review completion
+  review_complete: true
+  
+  # Critical issues found
+  critical_issues: true
+  
+  # Security vulnerabilities
+  security_alerts: true
+
+# Custom severity levels for iOS development
+severity_levels:
+  critical:
+    - "Memory leaks"
+    - "Retain cycles"
+    - "Main thread blocking"
+    - "Security vulnerabilities"
+    - "Privacy violations"
+  
+  high:
+    - "Performance issues"
+    - "Threading violations"
+    - "Core Data threading issues"
+    - "Force unwrapping"
+    - "Architecture violations"
+  
+  medium:
+    - "Code style violations"
+    - "Naming conventions"
+    - "Documentation missing"
+    - "Unused variables"
+  
+  low:
+    - "Spacing issues"
+    - "Comment style"
+    - "Import organization"
+
+# Learning and improvement
+learning:
+  # Enable learning from codebase patterns
+  adapt_to_codebase: true
+  
+  # Learn team coding standards
+  learn_team_style: true
+  
+  # Improve over time
+  continuous_learning: true
