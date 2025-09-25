@@ -41,6 +41,13 @@ jobs:
           GCC_OPTIMIZATION_LEVEL=0 \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
+          ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS=NO \
+          ASSETCATALOG_COMPILER_OPTIMIZATION=space \
+          ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS=NO \
+          ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS=NO \
+          SUPPORTED_PLATFORMS="iphoneos iphonesimulator" \
+          VALID_ARCHS="arm64" \
+          ARCHS="arm64" \
           2>&1 | tee build_output.log
         
         echo "📊 Build completed. Analyzing output..."

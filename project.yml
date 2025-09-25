@@ -114,6 +114,18 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         ENABLE_USER_SCRIPT_SANDBOXING: YES
+        # Fix for asset catalog compilation with Xcode 16
+        ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: NO
+        ASSETCATALOG_COMPILER_OPTIMIZATION: space
+        # SDK and runtime version fixes
+        IPHONEOS_DEPLOYMENT_TARGET: 16.0
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
+        VALID_ARCHS: "arm64 arm64e"
+        ARCHS: "arm64"
+        # Additional fixes for Xcode 16 asset catalog issues
+        ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
+        ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS: NO
+        ASSETCATALOG_COMPILER_SKIP_VALIDATION: NO
         # REQUIRED FOR FULL SCREEN SUPPORT - DO NOT REMOVE
         UIRequiresFullScreen: YES
         UIStatusBarStyle: UIStatusBarStyleDefault

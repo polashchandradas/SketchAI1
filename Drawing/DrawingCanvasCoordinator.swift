@@ -83,9 +83,9 @@ class DrawingCanvasCoordinator: NSObject, ObservableObject {
     private var stepStartTime = Date()
     private var stepStrokes: [DrawingStroke] = []
     
-    // MEMORY FIX: Add size limits for stroke buffers
-    private let maxStepStrokes = 10 // Limit step strokes to prevent unbounded growth
-    private let maxAnalysisCacheSize = 50 // Limit analysis cache size
+    // MEMORY FIX: Add reasonable size limits for stroke buffers
+    private let maxStepStrokes = 1000 // Allow substantial drawing while preventing unbounded growth
+    private let maxAnalysisCacheSize = 200 // Reasonable cache size for analysis
     
     // MARK: - Configuration
     private struct Config {
@@ -196,8 +196,8 @@ class DrawingCanvasCoordinator: NSObject, ObservableObject {
         // ENHANCED: Use autoreleasepool for immediate memory release
         autoreleasepool {
             strokeBuffer = CircularBuffer<CGPoint>(size: 120)
-            if stepStrokes.count > 8 {
-                stepStrokes = Array(stepStrokes.suffix(5))
+            if stepStrokes.count > 50 {
+                stepStrokes = Array(stepStrokes.suffix(40)) // Keep more strokes for user experience
             }
         }
         print("🧹 [DrawingCanvasCoordinator] Light cleanup performed with autoreleasepool")
@@ -207,8 +207,8 @@ class DrawingCanvasCoordinator: NSObject, ObservableObject {
         // ENHANCED: Use autoreleasepool for immediate memory release
         autoreleasepool {
             strokeBuffer = CircularBuffer<CGPoint>(size: 80)
-            if stepStrokes.count > 3 {
-                stepStrokes = Array(stepStrokes.suffix(2))
+            if stepStrokes.count > 20 {
+                stepStrokes = Array(stepStrokes.suffix(15)) // Keep more strokes for user experience
             }
             activeStrokes.removeAll(keepingCapacity: false)
             consecutiveAnalysisCount = 0
@@ -220,7 +220,9 @@ class DrawingCanvasCoordinator: NSObject, ObservableObject {
         // ENHANCED: Use autoreleasepool for immediate memory release
         autoreleasepool {
             strokeBuffer = CircularBuffer<CGPoint>(size: 50)
-            stepStrokes = stepStrokes.suffix(1).map { $0 }
+            if stepStrokes.count > 5 {
+                stepStrokes = Array(stepStrokes.suffix(3)) // Keep at least 3 strokes for user experience
+            }
             activeStrokes.removeAll(keepingCapacity: false)
             consecutiveAnalysisCount = 0
             
@@ -304,8 +306,8 @@ class DrawingCanvasCoordinator: NSObject, ObservableObject {
             strokeBuffer = CircularBuffer<CGPoint>(size: 100) // REDUCED to 100 during pressure
             
             // Clear step strokes more aggressively
-            if stepStrokes.count > 3 {
-                stepStrokes = Array(stepStrokes.suffix(2)) // Keep only last 2 strokes
+            if stepStrokes.count > 15 {
+                stepStrokes = Array(stepStrokes.suffix(10)) // Keep more strokes for user experience
             }
             
             // Force garbage collection with immediate cleanup
@@ -537,14 +539,8 @@ class DrawingCanvasCoordinator: NSObject, ObservableObject {
             velocity: velocity
         )
         
-        // Add to step strokes with size limit
+        // Add to step strokes (no artificial limits during normal drawing)
         stepStrokes.append(drawingStroke)
-        
-        // MEMORY FIX: Enforce size limit to prevent unbounded growth
-        if stepStrokes.count > maxStepStrokes {
-            stepStrokes = Array(stepStrokes.suffix(maxStepStrokes))
-            print("🧹 [MEMORY FIX] Trimmed stepStrokes to \(maxStepStrokes) to prevent unbounded growth")
-        }
         
         print("📝 [TUTORIAL] Added stroke to step collection (total: \(stepStrokes.count))")
         
@@ -584,9 +580,9 @@ class DrawingCanvasCoordinator: NSObject, ObservableObject {
         consecutiveAnalysisCount = 0
         lastMemoryCleanupTime = Date()
         
-        // Aggressively limit step strokes to prevent unbounded growth
-        if stepStrokes.count > 5 {
-            stepStrokes = Array(stepStrokes.suffix(3)) // Keep only last 3 strokes
+        // Only trim step strokes during scheduled cleanup (not during normal drawing)
+        if stepStrokes.count > 100 {
+            stepStrokes = Array(stepStrokes.suffix(80)) // Keep most recent strokes during cleanup
         }
         
         // Recreate stroke buffer with smaller size during cleanup
