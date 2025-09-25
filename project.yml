@@ -124,8 +124,8 @@ targets:
         IPHONEOS_DEPLOYMENT_TARGET: 17.0
         VALID_ARCHS: "arm64 arm64e"
         ARCHS: "arm64"
-        # Force device-only compilation to avoid simulator issues
-        SUPPORTED_PLATFORMS: "iphoneos"
+        # Include both platforms but exclude problematic simulator architectures
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
         # Exclude simulator architectures to prevent runtime conflicts
         EXCLUDED_ARCHS: "arm64"
         # Additional Xcode 16 compatibility fixes

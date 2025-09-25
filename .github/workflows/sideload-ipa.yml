@@ -87,8 +87,8 @@ jobs:
         export ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon
         export ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME=AccentColor
         export ASSETCATALOG_COMPILER_SKIP_VALIDATION=NO
-        # Force device-only compilation to avoid simulator issues
-        export SUPPORTED_PLATFORMS=iphoneos
+        # Include both platforms but exclude problematic simulator architectures
+        export SUPPORTED_PLATFORMS=iphoneos iphonesimulator
         export TARGETED_DEVICE_FAMILY=1,2
         # Force device-only compilation
         export ONLY_ACTIVE_ARCH=NO
@@ -128,13 +128,13 @@ jobs:
         echo "🔍 Checking deployment target in project file:"
         grep -i "IPHONEOS_DEPLOYMENT_TARGET" SketchAI.xcodeproj/project.pbxproj || echo "No deployment target found in project"
         
-        # Build without code signing with verbose output - use device destination to avoid simulator issues
+        # Build without code signing with verbose output - use simulator but with device-only settings
         echo "🔨 Starting build process..."
         xcodebuild clean \
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
           -configuration Debug \
-          -destination 'generic/platform=iOS'
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=18.4'
         
         # Force device-only asset catalog compilation
         echo "🔧 Forcing device-only asset catalog compilation..."
@@ -167,7 +167,7 @@ jobs:
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
           -configuration Debug \
-          -destination 'generic/platform=iOS' \
+          -destination 'platform=iOS Simulator,name=iPhone 15,OS=18.4' \
           -derivedDataPath ./DerivedData \
           -parallelizeTargets \
           -jobs 4 \
@@ -185,7 +185,7 @@ jobs:
           ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS=NO \
           ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon \
           ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME=AccentColor \
-          SUPPORTED_PLATFORMS="iphoneos" \
+          SUPPORTED_PLATFORMS="iphoneos iphonesimulator" \
           VALID_ARCHS="arm64" \
           ARCHS="arm64" \
           TARGETED_DEVICE_FAMILY="1,2" \
