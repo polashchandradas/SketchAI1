@@ -55,10 +55,18 @@ jobs:
         echo "🔧 Killing lingering simulator processes..."
         sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService 2>/dev/null || true
         
-        # Clean simulator state without removing runtimes
-        echo "🔧 Cleaning simulator state..."
+        # Completely disable simulator support
+        echo "🔧 Completely disabling simulator support..."
         sudo xcrun simctl shutdown all 2>/dev/null || true
         sudo xcrun simctl erase all 2>/dev/null || true
+        
+        # Remove simulator runtimes to prevent conflicts
+        echo "🔧 Removing simulator runtimes..."
+        sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes/* 2>/dev/null || true
+        
+        # Disable simulator support in Xcode
+        echo "🔧 Disabling simulator support in Xcode..."
+        sudo defaults write com.apple.dt.Xcode DVTEnableCoreSimulatorService -bool NO 2>/dev/null || true
         
         # Apply asset catalog fixes for device-only build
         echo "🔧 Applying asset catalog compilation fixes..."
@@ -69,8 +77,8 @@ jobs:
         export ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon
         export ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME=AccentColor
         export ASSETCATALOG_COMPILER_SKIP_VALIDATION=NO
-        # Include simulator support but exclude problematic architectures
-        export SUPPORTED_PLATFORMS=iphoneos iphonesimulator
+        # Force device-only compilation to avoid simulator runtime conflicts
+        export SUPPORTED_PLATFORMS=iphoneos
         export TARGETED_DEVICE_FAMILY=1,2
         # Force device-only compilation
         export ONLY_ACTIVE_ARCH=NO
@@ -99,7 +107,7 @@ jobs:
         export ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon
         export ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME=AccentColor
         export ASSETCATALOG_COMPILER_SKIP_VALIDATION=NO
-        export SUPPORTED_PLATFORMS=iphoneos iphonesimulator
+        export SUPPORTED_PLATFORMS=iphoneos
         export TARGETED_DEVICE_FAMILY=1,2
         export ONLY_ACTIVE_ARCH=NO
         export VALIDATE_PRODUCT=NO
@@ -127,7 +135,7 @@ jobs:
           ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS=NO \
           ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon \
           ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME=AccentColor \
-          SUPPORTED_PLATFORMS="iphoneos iphonesimulator" \
+          SUPPORTED_PLATFORMS="iphoneos" \
           VALID_ARCHS="arm64" \
           ARCHS="arm64" \
           TARGETED_DEVICE_FAMILY="1,2" \
@@ -143,6 +151,9 @@ jobs:
           ASSETCATALOG_COMPILER_OPTIMIZATION=space \
           ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS=NO \
           ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS=NO \
+          ASSETCATALOG_COMPILER_SKIP_VALIDATION=NO \
+          ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon \
+          ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME=AccentColor \
           2>&1 | tee sideload_build_output.log
         
         # Analyze build output for errors

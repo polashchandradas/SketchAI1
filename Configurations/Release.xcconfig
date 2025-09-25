@@ -42,8 +42,8 @@ ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = NO
 ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS = NO
 ASSETCATALOG_COMPILER_SKIP_VALIDATION = NO
 
-// SDK and Runtime Version Fixes - Include simulator but exclude problematic architectures
-SUPPORTED_PLATFORMS = iphoneos iphonesimulator
+// SDK and Runtime Version Fixes - Force device-only to avoid simulator runtime conflicts
+SUPPORTED_PLATFORMS = iphoneos
 VALID_ARCHS = arm64 arm64e
 ARCHS = arm64
 TARGETED_DEVICE_FAMILY = 1,2
