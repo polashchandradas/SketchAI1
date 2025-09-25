@@ -51,6 +51,10 @@ jobs:
         echo "📱 Regenerating Xcode project..."
         xcodegen generate
         
+        # Kill any lingering simulator processes that could cause runtime conflicts
+        echo "🔧 Killing lingering simulator processes..."
+        sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService 2>/dev/null || true
+        
         # Apply asset catalog fixes for device-only build
         echo "🔧 Applying asset catalog compilation fixes..."
         export ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS=NO
@@ -103,6 +107,7 @@ jobs:
           ARCHS="arm64" \
           TARGETED_DEVICE_FAMILY="1,2" \
           IPHONEOS_DEPLOYMENT_TARGET=16.0 \
+          EXCLUDED_ARCHS[sdk=iphonesimulator*]="arm64" \
           2>&1 | tee sideload_build_output.log
         
         # Analyze build output for errors

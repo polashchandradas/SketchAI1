@@ -44,6 +44,10 @@ jobs:
       run: |
         echo "🚀 Building SketchAI for iOS Device..."
         
+        # Kill any lingering simulator processes that could cause runtime conflicts
+        echo "🔧 Killing lingering simulator processes..."
+        sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService 2>/dev/null || true
+        
         # Build for iOS device (generic/platform=iOS)
         xcodebuild build \
           -project SketchAI.xcodeproj \
@@ -63,6 +67,7 @@ jobs:
           SUPPORTED_PLATFORMS="iphoneos" \
           VALID_ARCHS="arm64" \
           ARCHS="arm64" \
+          EXCLUDED_ARCHS[sdk=iphonesimulator*]="arm64" \
           -allowProvisioningUpdates \
           archive
     

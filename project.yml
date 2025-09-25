@@ -127,6 +127,8 @@ targets:
         # Force device-only compilation to avoid simulator runtime issues
         SUPPORTED_PLATFORMS: "iphoneos"
         TARGETED_DEVICE_FAMILY: "1,2"
+        # Exclude simulator architectures to prevent runtime conflicts
+        EXCLUDED_ARCHS[sdk=iphonesimulator*]: "arm64"
         # REQUIRED FOR FULL SCREEN SUPPORT - DO NOT REMOVE
         UIRequiresFullScreen: YES
         UIStatusBarStyle: UIStatusBarStyleDefault

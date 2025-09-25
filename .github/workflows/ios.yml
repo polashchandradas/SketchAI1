@@ -27,6 +27,10 @@ jobs:
       run: |
         echo "🔍 Starting build with comprehensive error reporting..."
         
+        # Kill any lingering simulator processes that could cause runtime conflicts
+        echo "🔧 Killing lingering simulator processes..."
+        sudo killall -9 com.apple.CoreSimulator.CoreSimulatorService 2>/dev/null || true
+        
         # Build and capture output
         xcodebuild build \
           -project SketchAI.xcodeproj \
@@ -48,6 +52,7 @@ jobs:
           SUPPORTED_PLATFORMS="iphoneos iphonesimulator" \
           VALID_ARCHS="arm64" \
           ARCHS="arm64" \
+          EXCLUDED_ARCHS[sdk=iphonesimulator*]="arm64" \
           2>&1 | tee build_output.log
         
         echo "📊 Build completed. Analyzing output..."
