@@ -116,7 +116,7 @@ jobs:
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
           -configuration Debug \
-          -destination 'generic/platform=iOS'
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4'
         
         # Force device-only asset catalog compilation
         echo "🔧 Forcing device-only asset catalog compilation..."
@@ -141,7 +141,7 @@ jobs:
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
           -configuration Debug \
-          -destination 'generic/platform=iOS' \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
           -derivedDataPath ./DerivedData \
           -parallelizeTargets \
           -jobs 4 \
