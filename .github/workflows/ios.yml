@@ -1,0 +1,79 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '16.0'
+    
+    - name: Install XcodeGen
+      run: brew install xcodegen
+    
+    - name: Generate Project
+      run: xcodegen generate
+    
+    - name: Build with All Errors
+      run: |
+        echo "🔍 Starting build with comprehensive error reporting..."
+        
+        # Build and capture output
+        xcodebuild build \
+          -project SketchAI.xcodeproj \
+          -scheme SketchAI \
+          -configuration Debug \
+          -destination 'generic/platform=iOS Simulator' \
+          -parallelizeTargets \
+          -jobs 4 \
+          -showBuildTimingSummary \
+          SWIFT_COMPILATION_MODE=wholemodule \
+          SWIFT_OPTIMIZATION_LEVEL=-Onone \
+          GCC_OPTIMIZATION_LEVEL=0 \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          2>&1 | tee build_output.log
+        
+        echo "📊 Build completed. Analyzing output..."
+        
+        # Display build output in GitHub Actions log
+        echo "🔍 BUILD OUTPUT:"
+        echo "==============="
+        cat build_output.log
+        
+        # Count errors and warnings
+        TOTAL_ERRORS=$(grep -c "error:" build_output.log || echo "0")
+        TOTAL_WARNINGS=$(grep -c "warning:" build_output.log || echo "0")
+        
+        echo ""
+        echo "📊 BUILD STATISTICS:"
+        echo "  Total Errors: $TOTAL_ERRORS"
+        echo "  Total Warnings: $TOTAL_WARNINGS"
+        
+        # Show all errors if any
+        if [ $TOTAL_ERRORS -gt 0 ]; then
+          echo ""
+          echo "🔴 ALL COMPILATION ERRORS:"
+          echo "=========================="
+          grep -n "error:" build_output.log
+        fi
+        
+        # Show warnings if any
+        if [ $TOTAL_WARNINGS -gt 0 ]; then
+          echo ""
+          echo "⚠️ ALL WARNINGS:"
+          echo "================"
+          grep -n "warning:" build_output.log | head -50
+        fi
+        
+        echo ""
+        echo "✅ Build analysis complete!"

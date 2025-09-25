@@ -1,0 +1,21 @@
+{
+  "functions": {
+    "source": ".",
+    "runtime": "nodejs18",
+    "memory": "256MB",
+    "timeout": "60s",
+    "env": {
+      "WEBHOOK_API_KEY": "sketchai_webhook_key_2024_production",
+      "NODE_ENV": "production"
+    }
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    }
+  }
+}

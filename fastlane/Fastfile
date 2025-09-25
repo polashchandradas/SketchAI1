@@ -1,0 +1,137 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Generate Xcode project"
+  lane :generate_project do
+    sh("cd .. && xcodegen generate")
+    UI.success("✅ Xcode project generated successfully!")
+  end
+
+  desc "Run tests"
+  lane :test do
+    generate_project
+    
+    run_tests(
+      workspace: "SketchAI.xcworkspace",
+      scheme: "SketchAI",
+      device: "iPhone 15 Pro",
+      clean: true
+    )
+  end
+
+  desc "Build for development"
+  lane :build_dev do
+    generate_project
+    
+    build_app(
+      workspace: "SketchAI.xcworkspace",
+      scheme: "SketchAI",
+      configuration: "Debug",
+      export_method: "development",
+      output_directory: "build/",
+      output_name: "SketchAI_Debug.ipa",
+      clean: true
+    )
+    
+    UI.success("✅ Development build completed!")
+  end
+
+  desc "Build for App Store"
+  lane :build_appstore do
+    generate_project
+    
+    # Increment build number
+    increment_build_number(
+      build_number: latest_testflight_build_number + 1
+    )
+    
+    build_app(
+      workspace: "SketchAI.xcworkspace",
+      scheme: "SketchAI",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "build/",
+      output_name: "SketchAI_AppStore.ipa",
+      clean: true
+    )
+    
+    UI.success("✅ App Store build completed!")
+  end
+
+  desc "Deploy to TestFlight"
+  lane :beta do
+    build_appstore
+    
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      ipa: "build/SketchAI_AppStore.ipa"
+    )
+    
+    UI.success("✅ Successfully uploaded to TestFlight!")
+  end
+
+  desc "Deploy to App Store"
+  lane :release do
+    build_appstore
+    
+    upload_to_app_store(
+      force: true,
+      ipa: "build/SketchAI_AppStore.ipa",
+      submit_for_review: false,
+      automatic_release: false,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        add_id_info_serves_ads: false,
+        add_id_info_tracks_install: false,
+        add_id_info_tracks_action: false,
+        add_id_info_limits_tracking: true,
+        content_rights_has_rights: true,
+        content_rights_contains_third_party_content: false,
+        export_compliance_platform: 'ios',
+        export_compliance_compliance_required: false,
+        export_compliance_encryption_updated: false,
+        export_compliance_app_type: nil,
+        export_compliance_uses_encryption: false,
+        export_compliance_is_exempt: false,
+        export_compliance_contains_third_party_cryptography: false,
+        export_compliance_contains_proprietary_cryptography: false,
+        export_compliance_available_on_french_store: false
+      }
+    )
+    
+    UI.success("✅ Successfully uploaded to App Store!")
+  end
+
+  desc "Update certificates and provisioning profiles"
+  lane :certificates do
+    match(type: "development", readonly: true)
+    match(type: "appstore", readonly: true)
+  end
+
+  desc "Clean build artifacts"
+  lane :clean do
+    sh("cd .. && rm -rf build/")
+    sh("cd .. && rm -rf DerivedData/")
+    UI.success("✅ Build artifacts cleaned!")
+  end
+
+  # Error handling
+  error do |lane, exception|
+    UI.error("❌ Lane '#{lane}' failed with exception: #{exception}")
+  end
+end
