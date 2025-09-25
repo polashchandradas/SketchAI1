@@ -26,6 +26,9 @@ jobs:
       with:
         xcode-version: '16.0'
     
+    - name: 🔧 Select Xcode Version (Force 16.0)
+      run: sudo xcode-select -switch /Applications/Xcode_16.app
+    
     - name: 🛠️ Install Tools
       run: |
         brew install xcodegen
@@ -73,6 +76,10 @@ jobs:
         echo "🔧 Ensuring simulator exists..."
         xcrun simctl list devices | grep "iPhone" | head -1 || xcrun simctl create "iPhone 15" "iPhone 15" "iOS 17.0" || echo "Could not create simulator"
         
+        # Critical fix: Boot the simulator to ensure it's available
+        echo "🔧 Booting simulator to ensure availability..."
+        xcrun simctl boot "iPhone 16 Pro" 2>/dev/null || echo "Simulator already booted or not available"
+        
         # Apply asset catalog fixes for device-only build
         echo "🔧 Applying asset catalog compilation fixes..."
         export ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS=NO
@@ -106,6 +113,10 @@ jobs:
         # Check what iOS versions are actually available
         echo "🔍 Available iOS runtimes:"
         xcrun simctl list runtimes | grep iOS || echo "No iOS runtimes found"
+        
+        # Force use of available iOS 18.4 runtime instead of 18.0
+        echo "🔧 Forcing use of available iOS 18.4 runtime..."
+        export IOS_SIMULATOR_RUNTIME="iOS 18.4"
         
         # List available destinations for debugging
         echo "🔍 Available destinations:"
@@ -146,6 +157,15 @@ jobs:
         echo "🔧 Forcing iOS 17.0 deployment target..."
         export IPHONEOS_DEPLOYMENT_TARGET=17.0
         
+        # Critical fix: Use available iOS runtime instead of 18.0
+        echo "🔧 Using available iOS 18.4 runtime instead of 18.0..."
+        export IOS_SIMULATOR_RUNTIME="iOS 18.4"
+        
+        # Critical fix for Xcode 16 asset catalog compilation
+        echo "🔧 Applying critical Xcode 16 architecture exclusions..."
+        export EXCLUDED_ARCHS="arm64"
+        export EXCLUDED_ARCHS[sdk=iphonesimulator*]="arm64"
+        
         xcodebuild build \
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
@@ -174,6 +194,7 @@ jobs:
           TARGETED_DEVICE_FAMILY="1,2" \
           IPHONEOS_DEPLOYMENT_TARGET=17.0 \
           EXCLUDED_ARCHS[sdk=iphonesimulator*]="arm64" \
+          EXCLUDED_ARCHS="arm64" \
           ONLY_ACTIVE_ARCH=NO \
           VALIDATE_PRODUCT=NO \
           SKIP_INSTALL=NO \
@@ -223,7 +244,7 @@ jobs:
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
           -configuration Debug \
-          -destination 'generic/platform=iOS Simulator' \
+          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
           -derivedDataPath ./DerivedData \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
