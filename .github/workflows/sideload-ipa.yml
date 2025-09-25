@@ -60,6 +60,10 @@ jobs:
         sudo xcrun simctl shutdown all 2>/dev/null || true
         sudo xcrun simctl erase all 2>/dev/null || true
         
+        # Create a default simulator if none exist
+        echo "🔧 Ensuring simulator exists..."
+        xcrun simctl list devices | grep "iPhone" | head -1 || xcrun simctl create "iPhone 15" "iPhone 15" "iOS 18.0" || echo "Could not create simulator"
+        
         # Apply asset catalog fixes for device-only build
         echo "🔧 Applying asset catalog compilation fixes..."
         export ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS=NO
@@ -83,12 +87,21 @@ jobs:
           exit 1
         fi
         
+        # List available destinations for debugging
+        echo "🔍 Available destinations:"
+        xcodebuild -project SketchAI.xcodeproj -scheme SketchAI -showdestinations || echo "No destinations found"
+        
+        # List schemes for debugging
+        echo "🔍 Available schemes:"
+        xcodebuild -project SketchAI.xcodeproj -list
+        
         # Build without code signing with verbose output
         echo "🔨 Starting build process..."
         xcodebuild clean \
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
-          -configuration Debug
+          -configuration Debug \
+          -destination 'generic/platform=iOS'
         
         # Force device-only asset catalog compilation
         echo "🔧 Forcing device-only asset catalog compilation..."
