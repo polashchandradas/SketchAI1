@@ -76,9 +76,7 @@ jobs:
         echo "🔧 Ensuring simulator exists..."
         xcrun simctl list devices | grep "iPhone" | head -1 || xcrun simctl create "iPhone 15" "iPhone 15" "iOS 17.0" || echo "Could not create simulator"
         
-        # Critical fix: Boot the simulator to ensure it's available
-        echo "🔧 Booting simulator to ensure availability..."
-        xcrun simctl boot "iPhone 16 Pro" 2>/dev/null || echo "Simulator already booted or not available"
+        # Using generic simulator destination - no need to boot specific simulator
         
         # Apply asset catalog fixes for device-only build
         echo "🔧 Applying asset catalog compilation fixes..."
@@ -130,13 +128,13 @@ jobs:
         echo "🔍 Checking deployment target in project file:"
         grep -i "IPHONEOS_DEPLOYMENT_TARGET" SketchAI.xcodeproj/project.pbxproj || echo "No deployment target found in project"
         
-        # Build without code signing with verbose output - use simulator but with device-only settings
+        # Build without code signing with verbose output - use generic simulator destination
         echo "🔨 Starting build process..."
         xcodebuild clean \
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
           -configuration Debug \
-          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4'
+          -destination 'platform=iOS Simulator,name=Any iOS Simulator Device'
         
         # Force device-only asset catalog compilation
         echo "🔧 Forcing device-only asset catalog compilation..."
@@ -169,7 +167,7 @@ jobs:
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
           -configuration Debug \
-          -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.4' \
+          -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
           -derivedDataPath ./DerivedData \
           -parallelizeTargets \
           -jobs 4 \
