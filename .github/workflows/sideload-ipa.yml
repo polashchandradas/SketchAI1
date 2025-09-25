@@ -42,14 +42,23 @@ jobs:
       run: |
         echo "🚀 Building unsigned IPA for sideloading..."
         
-        # Clean any previous builds
-        echo "🧹 Cleaning previous builds..."
+        # Clean any previous builds and derived data
+        echo "🧹 Cleaning previous builds and derived data..."
         rm -rf ./DerivedData
         rm -rf SketchAI.xcodeproj
+        rm -rf ~/Library/Developer/Xcode/DerivedData/SketchAI-*
+        
+        # Clean Xcode build cache
+        echo "🧹 Cleaning Xcode build cache..."
+        xcodebuild clean -project SketchAI.xcodeproj -scheme SketchAI -configuration Debug 2>/dev/null || true
         
         # Regenerate project to ensure fresh state
         echo "📱 Regenerating Xcode project..."
         xcodegen generate
+        
+        # Verify asset catalog integrity
+        echo "🔍 Verifying asset catalog integrity..."
+        find Assets/ReferenceImages.xcassets -name "*.png" -exec file {} \; | grep -v "PNG image" && echo "⚠️ Found corrupted PNG files" || echo "✅ All PNG files are valid"
         
         # Kill any lingering simulator processes that could cause runtime conflicts
         echo "🔧 Killing lingering simulator processes..."
