@@ -62,7 +62,7 @@ jobs:
         
         # Create a default simulator if none exist
         echo "🔧 Ensuring simulator exists..."
-        xcrun simctl list devices | grep "iPhone" | head -1 || xcrun simctl create "iPhone 15" "iPhone 15" "iOS 18.0" || echo "Could not create simulator"
+        xcrun simctl list devices | grep "iPhone" | head -1 || xcrun simctl create "iPhone 15" "iPhone 15" "iOS 17.0" || echo "Could not create simulator"
         
         # Apply asset catalog fixes for device-only build
         echo "🔧 Applying asset catalog compilation fixes..."
@@ -87,6 +87,17 @@ jobs:
           exit 1
         fi
         
+        # List available iOS versions and simulators
+        echo "🔍 Available iOS SDKs:"
+        xcrun xcodebuild -showsdks | grep iOS || echo "No iOS SDKs found"
+        
+        echo "🔍 Available simulators:"
+        xcrun simctl list devices | grep iPhone || echo "No iPhone simulators found"
+        
+        # Check what iOS versions are actually available
+        echo "🔍 Available iOS runtimes:"
+        xcrun simctl list runtimes | grep iOS || echo "No iOS runtimes found"
+        
         # List available destinations for debugging
         echo "🔍 Available destinations:"
         xcodebuild -project SketchAI.xcodeproj -scheme SketchAI -showdestinations || echo "No destinations found"
@@ -94,6 +105,10 @@ jobs:
         # List schemes for debugging
         echo "🔍 Available schemes:"
         xcodebuild -project SketchAI.xcodeproj -list
+        
+        # Check the actual deployment target in the generated project
+        echo "🔍 Checking deployment target in project file:"
+        grep -i "IPHONEOS_DEPLOYMENT_TARGET" SketchAI.xcodeproj/project.pbxproj || echo "No deployment target found in project"
         
         # Build without code signing with verbose output
         echo "🔨 Starting build process..."
@@ -117,6 +132,10 @@ jobs:
         export ONLY_ACTIVE_ARCH=NO
         export VALIDATE_PRODUCT=NO
         export SKIP_INSTALL=NO
+        
+        # Force iOS 17.0 deployment target in build command
+        echo "🔧 Forcing iOS 17.0 deployment target..."
+        export IPHONEOS_DEPLOYMENT_TARGET=17.0
         
         xcodebuild build \
           -project SketchAI.xcodeproj \
