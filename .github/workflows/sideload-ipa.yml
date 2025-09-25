@@ -110,13 +110,13 @@ jobs:
         echo "🔍 Checking deployment target in project file:"
         grep -i "IPHONEOS_DEPLOYMENT_TARGET" SketchAI.xcodeproj/project.pbxproj || echo "No deployment target found in project"
         
-        # Build without code signing with verbose output
+        # Build without code signing with verbose output - use generic iOS platform to avoid simulator issues
         echo "🔨 Starting build process..."
         xcodebuild clean \
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
           -configuration Debug \
-          -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=18.4'
+          -destination 'generic/platform=iOS'
         
         # Force device-only asset catalog compilation
         echo "🔧 Forcing device-only asset catalog compilation..."
@@ -127,7 +127,7 @@ jobs:
         export ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon
         export ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME=AccentColor
         export ASSETCATALOG_COMPILER_SKIP_VALIDATION=NO
-        export SUPPORTED_PLATFORMS=iphoneos iphonesimulator
+        export SUPPORTED_PLATFORMS=iphoneos
         export TARGETED_DEVICE_FAMILY=1,2
         export ONLY_ACTIVE_ARCH=NO
         export VALIDATE_PRODUCT=NO
@@ -141,7 +141,7 @@ jobs:
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
           -configuration Debug \
-          -destination 'platform=iOS Simulator,name=iPhone 16 Pro Max,OS=18.4' \
+          -destination 'generic/platform=iOS' \
           -derivedDataPath ./DerivedData \
           -parallelizeTargets \
           -jobs 4 \
@@ -159,12 +159,11 @@ jobs:
           ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS=NO \
           ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon \
           ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME=AccentColor \
-          SUPPORTED_PLATFORMS="iphoneos iphonesimulator" \
+          SUPPORTED_PLATFORMS="iphoneos" \
           VALID_ARCHS="arm64" \
           ARCHS="arm64" \
           TARGETED_DEVICE_FAMILY="1,2" \
           IPHONEOS_DEPLOYMENT_TARGET=17.0 \
-          EXCLUDED_ARCHS[sdk=iphonesimulator*]="arm64" \
           ONLY_ACTIVE_ARCH=NO \
           VALIDATE_PRODUCT=NO \
           SKIP_INSTALL=NO \

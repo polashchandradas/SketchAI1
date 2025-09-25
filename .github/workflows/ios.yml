@@ -36,7 +36,7 @@ jobs:
           -project SketchAI.xcodeproj \
           -scheme SketchAI \
           -configuration Debug \
-          -destination 'generic/platform=iOS Simulator' \
+          -destination 'generic/platform=iOS' \
           -parallelizeTargets \
           -jobs 4 \
           -showBuildTimingSummary \
@@ -49,10 +49,9 @@ jobs:
           ASSETCATALOG_COMPILER_OPTIMIZATION=space \
           ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS=NO \
           ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS=NO \
-          SUPPORTED_PLATFORMS="iphoneos iphonesimulator" \
+          SUPPORTED_PLATFORMS="iphoneos" \
           VALID_ARCHS="arm64" \
           ARCHS="arm64" \
-          EXCLUDED_ARCHS[sdk=iphonesimulator*]="arm64" \
           2>&1 | tee build_output.log
         
         echo "📊 Build completed. Analyzing output..."

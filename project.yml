@@ -124,11 +124,9 @@ targets:
         IPHONEOS_DEPLOYMENT_TARGET: 17.0
         VALID_ARCHS: "arm64 arm64e"
         ARCHS: "arm64"
-        # Include both platforms but exclude problematic simulator architectures
-        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
-        TARGETED_DEVICE_FAMILY: "1,2"
-        # Exclude simulator architectures to prevent runtime conflicts
-        EXCLUDED_ARCHS[sdk=iphonesimulator*]: "arm64"
+                    # Force device-only compilation to avoid simulator runtime conflicts
+                    SUPPORTED_PLATFORMS: "iphoneos"
+                    TARGETED_DEVICE_FAMILY: "1,2"
         # Force device-only asset catalog compilation
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
