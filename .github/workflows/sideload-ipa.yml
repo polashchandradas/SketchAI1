@@ -164,7 +164,6 @@ jobs:
         # Critical fix for Xcode 16 asset catalog compilation
         echo "🔧 Applying critical Xcode 16 architecture exclusions..."
         export EXCLUDED_ARCHS="arm64"
-        export EXCLUDED_ARCHS[sdk=iphonesimulator*]="arm64"
         
         xcodebuild build \
           -project SketchAI.xcodeproj \
@@ -193,7 +192,6 @@ jobs:
           ARCHS="arm64" \
           TARGETED_DEVICE_FAMILY="1,2" \
           IPHONEOS_DEPLOYMENT_TARGET=17.0 \
-          EXCLUDED_ARCHS[sdk=iphonesimulator*]="arm64" \
           EXCLUDED_ARCHS="arm64" \
           ONLY_ACTIVE_ARCH=NO \
           VALIDATE_PRODUCT=NO \

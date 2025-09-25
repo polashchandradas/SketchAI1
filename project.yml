@@ -127,8 +127,6 @@ targets:
         # Include both platforms but exclude problematic simulator architectures
         SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
         # Exclude simulator architectures to prevent runtime conflicts
-        EXCLUDED_ARCHS[sdk=iphonesimulator*]: "arm64"
-        # Additional critical fix for Xcode 16
         EXCLUDED_ARCHS: "arm64"
         # Additional Xcode 16 compatibility fixes
         ENABLE_BITCODE: NO

@@ -45,8 +45,6 @@ ASSETCATALOG_COMPILER_SKIP_VALIDATION = NO
 // SDK and Runtime Version Fixes - Include both platforms but exclude problematic architectures
 SUPPORTED_PLATFORMS = iphoneos iphonesimulator
 // Exclude simulator architectures to prevent runtime conflicts
-EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64
-// Additional critical fix for Xcode 16
 EXCLUDED_ARCHS = arm64
 VALID_ARCHS = arm64 arm64e
 ARCHS = arm64
