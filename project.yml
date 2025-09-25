@@ -125,7 +125,7 @@ targets:
         VALID_ARCHS: "arm64 arm64e"
         ARCHS: "arm64"
         # Force device-only compilation to avoid simulator runtime issues
-        SUPPORTED_PLATFORMS: "iphoneos"
+        SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
         TARGETED_DEVICE_FAMILY: "1,2"
         # Exclude simulator architectures to prevent runtime conflicts
         EXCLUDED_ARCHS[sdk=iphonesimulator*]: "arm64"
