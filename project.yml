@@ -129,6 +129,15 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         # Exclude simulator architectures to prevent runtime conflicts
         EXCLUDED_ARCHS[sdk=iphonesimulator*]: "arm64"
+        # Force device-only asset catalog compilation
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        # Disable all simulator-related asset catalog features
+        ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: NO
+        ASSETCATALOG_COMPILER_OPTIMIZATION: space
+        ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
+        ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS: NO
+        ASSETCATALOG_COMPILER_SKIP_VALIDATION: NO
         # REQUIRED FOR FULL SCREEN SUPPORT - DO NOT REMOVE
         UIRequiresFullScreen: YES
         UIStatusBarStyle: UIStatusBarStyleDefault
