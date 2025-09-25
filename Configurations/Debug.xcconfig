@@ -40,5 +40,6 @@ SUPPORTED_PLATFORMS = iphoneos iphonesimulator
 VALID_ARCHS = arm64 arm64e
 ARCHS = arm64
 TARGETED_DEVICE_FAMILY = 1,2
+IPHONEOS_DEPLOYMENT_TARGET = 17.0
 // Exclude simulator architectures to prevent runtime conflicts
 EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64

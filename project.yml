@@ -2,7 +2,7 @@ name: SketchAI
 options:
   minimumXcodeGenVersion: 2.37.0
   deploymentTarget:
-    iOS: '16.0'
+    iOS: '17.0'
   createIntermediateGroups: true
   groupSortPosition: top
   generateEmptyDirectories: true
@@ -21,7 +21,7 @@ targets:
   SketchAI:
     type: application
     platform: iOS
-    deploymentTarget: '16.0'
+    deploymentTarget: '17.0'
     sources:
       - path: .
         excludes:
@@ -72,7 +72,7 @@ targets:
         PRODUCT_NAME: SketchAI
         SWIFT_VERSION: 5.9
         TARGETED_DEVICE_FAMILY: "1,2"
-        IPHONEOS_DEPLOYMENT_TARGET: 16.0
+        IPHONEOS_DEPLOYMENT_TARGET: 17.0
         INFOPLIST_FILE: Info.plist
         CODE_SIGNING_ALLOWED: YES
         ALWAYS_SEARCH_USER_PATHS: NO
@@ -121,7 +121,7 @@ targets:
         ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOLS: NO
         ASSETCATALOG_COMPILER_SKIP_VALIDATION: NO
         # SDK and runtime version fixes
-        IPHONEOS_DEPLOYMENT_TARGET: 16.0
+        IPHONEOS_DEPLOYMENT_TARGET: 17.0
         VALID_ARCHS: "arm64 arm64e"
         ARCHS: "arm64"
         # Include both platforms but exclude problematic simulator architectures
@@ -201,7 +201,7 @@ targets:
   SketchAITests:
     type: bundle.unit-test
     platform: iOS
-    deploymentTarget: '16.0'
+    deploymentTarget: '17.0'
     sources:
       - path: Tests
     dependencies:
